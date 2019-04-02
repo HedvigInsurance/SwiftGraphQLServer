@@ -37,7 +37,7 @@ enum GraphQLServerError: Error, Debuggable {
     case queryFailed, noData
 }
 
-struct GraphQLServer<RootValue, Context, EventLoop: EventLoopGroup> {
+public struct GraphQLServer<RootValue, Context, EventLoop: EventLoopGroup> {
     let schema: Schema<RootValue, Context, EventLoop>
     
     func run(router: Router) throws -> Void {
