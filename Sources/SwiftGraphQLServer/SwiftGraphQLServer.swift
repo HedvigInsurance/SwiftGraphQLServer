@@ -44,7 +44,7 @@ public struct GraphQLServer<RootValue, Context, EventLoop: EventLoopGroup> {
         self.schema = schema
     }
     
-    func run(router: Router) throws -> Void {
+    public func run(router: Router) throws -> Void {
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
         
         router.post("graphql") { req -> Future<String> in
