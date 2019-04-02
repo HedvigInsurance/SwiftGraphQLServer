@@ -40,6 +40,10 @@ enum GraphQLServerError: Error, Debuggable {
 public struct GraphQLServer<RootValue, Context, EventLoop: EventLoopGroup> {
     let schema: Schema<RootValue, Context, EventLoop>
     
+    public init(schema: Schema<RootValue, Context, EventLoop>) {
+        self.schema = schema
+    }
+    
     func run(router: Router) throws -> Void {
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
         
