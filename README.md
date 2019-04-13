@@ -14,7 +14,7 @@ let schema = try Schema<Void, Void, MultiThreadedEventLoopGroup> { schema in
         try query.field(
             name: "test",
             type: String.self
-        ) { (_, arguments: HeroArguments, _, eventLoop, _) in
+        ) { (_, _, _, eventLoop, _) in
             return eventLoop.next().newSucceededFuture(result: "test")
         }
     }
