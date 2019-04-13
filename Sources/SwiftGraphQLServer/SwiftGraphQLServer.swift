@@ -39,9 +39,17 @@ enum GraphQLServerError: Error, Debuggable {
 
 public struct GraphQLServer<RootValue, Context, EventLoop: EventLoopGroup> {
     let schema: Schema<RootValue, Context, EventLoop>
+    let getRootValue: (_ req: Request) -> RootValue
+    let getContext: (_ req: Request) -> Context
     
-    public init(schema: Schema<RootValue, Context, EventLoop>) {
+    public init(
+        schema: Schema<RootValue, Context, EventLoop>,
+        getContext: @escaping (_ req: Request) -> Context,
+        getRootValue: @escaping (_ req: Request) -> RootValue
+        ) {
         self.schema = schema
+        self.getContext = getContext
+        self.getRootValue = getRootValue
     }
     
     public func run(router: Router) throws -> Void {
@@ -59,7 +67,9 @@ public struct GraphQLServer<RootValue, Context, EventLoop: EventLoopGroup> {
             do {
                 let graphQLFuture = try self.schema.execute(
                     request: httpBody.query,
-                    eventLoopGroup: eventLoopGroup,
+                    rootValue: self.getRootValue(req),
+                    context: self.getContext(req),
+                    worker: eventLoopGroup,
                     variables: httpBody.variables,
                     operationName: httpBody.operationName
                 )
@@ -79,5 +89,4 @@ public struct GraphQLServer<RootValue, Context, EventLoop: EventLoopGroup> {
             }
         }
     }
-    
 }
