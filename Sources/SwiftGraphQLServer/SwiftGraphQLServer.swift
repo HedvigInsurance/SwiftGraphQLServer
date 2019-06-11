@@ -37,24 +37,22 @@ enum GraphQLServerError: Error, Debuggable {
     case queryFailed, noData
 }
 
-public struct GraphQLServer<RootValue, Context, EventLoop: EventLoopGroup> {
-    let schema: Schema<RootValue, Context, EventLoop>
+public struct GraphQLServer<RootValue: FieldKeyProvider, Context> {
+    let schema: Schema<RootValue, Context>
     let getRootValue: (_ req: Request) -> RootValue
     let getContext: (_ req: Request) -> Context
     
     public init(
-        schema: Schema<RootValue, Context, EventLoop>,
+        schema: Schema<RootValue, Context>,
         getContext: @escaping (_ req: Request) -> Context,
         getRootValue: @escaping (_ req: Request) -> RootValue
-        ) {
+    ) {
         self.schema = schema
         self.getContext = getContext
         self.getRootValue = getRootValue
     }
     
     public func run(router: Router) throws -> Void {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-        
         router.post("graphql") { req -> Future<String> in
             guard let httpBodyData = req.http.body.data else {
                 return req.eventLoop.newFailedFuture(error: GraphQLServerError.noData)
@@ -64,29 +62,24 @@ public struct GraphQLServer<RootValue, Context, EventLoop: EventLoopGroup> {
             
             let promise: Promise<String> = req.eventLoop.newPromise()
             
-            do {
-                let graphQLFuture = try self.schema.execute(
-                    request: httpBody.query,
-                    rootValue: self.getRootValue(req),
-                    context: self.getContext(req),
-                    worker: eventLoopGroup,
-                    variables: httpBody.variables,
-                    operationName: httpBody.operationName
-                )
-                
-                graphQLFuture.whenFailure({ error in
-                    promise.fail(error: error)
-                })
-                
-                graphQLFuture.whenSuccess({ map in
-                    promise.succeed(result: map.description)
-                })
-                
-                return promise.futureResult
-            } catch {
-                promise.fail(error: GraphQLServerError.queryFailed)
-                return promise.futureResult
-            }
+            let graphQLFuture = self.schema.execute(
+                request: httpBody.query,
+                root: self.getRootValue(req),
+                context: self.getContext(req),
+                eventLoopGroup: req.eventLoop,
+                variables: httpBody.variables,
+                operationName: httpBody.operationName
+            )
+            
+            graphQLFuture.whenFailure({ error in
+                promise.fail(error: error)
+            })
+            
+            graphQLFuture.whenSuccess({ map in
+                promise.succeed(result: map.description)
+            })
+            
+            return promise.futureResult
         }
     }
 }
