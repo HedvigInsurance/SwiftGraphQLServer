@@ -48,20 +48,20 @@
       },
       {
         "package": "Graphiti",
-        "repositoryURL": "https://github.com/GraphQLSwift/Graphiti.git",
+        "repositoryURL": "https://github.com/HedvigInsurance/Graphiti.git",
         "state": {
           "branch": null,
-          "revision": "050842057b769534017452dfd5e73b86d5ea6872",
-          "version": "0.10.0"
+          "revision": "90f324e31f186f894020b4161e558c181cdabdc4",
+          "version": "0.13.0"
         }
       },
       {
         "package": "GraphQL",
-        "repositoryURL": "https://github.com/GraphQLSwift/GraphQL.git",
+        "repositoryURL": "https://github.com/HedvigInsurance/GraphQL.git",
         "state": {
           "branch": null,
-          "revision": "cba343ae0809fc407946f3538c7b80fc94bd5244",
-          "version": "0.11.0"
+          "revision": "a3ee0c92d6328f57282c83d930afa061fd2f449c",
+          "version": "0.14.0"
         }
       },
       {
