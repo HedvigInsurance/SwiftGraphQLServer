@@ -28,7 +28,7 @@ enum GraphQLServerError: Error, CustomDebugStringConvertible {
     case queryFailed, noData
 }
 
-public struct GraphQLServer<RootValue: FieldKeyProvider, Context, R: Router> {
+public struct GraphQLServer<RootValue: FieldKeyProvider, Context> {
     let schema: Schema<RootValue, Context>
     let getRootValue: (_ req: Request) -> RootValue
     let getContext: (_ req: Request) -> Context
