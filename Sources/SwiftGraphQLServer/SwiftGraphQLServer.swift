@@ -15,17 +15,8 @@ struct GraphQLHTTPBody: Decodable {
     let variables: [String: Map]
 }
 
-enum GraphQLServerError: Error, Debuggable {
-    var identifier: String {
-        switch self {
-        case .noData:
-            return "noData"
-        case .queryFailed:
-            return "queryFailed"
-        }
-    }
-    
-    var reason: String {
+enum GraphQLServerError: Error, CustomDebugStringConvertible {
+    var debugDescription: String {
         switch self {
         case .noData:
             return "Could not parse incoming request"
@@ -37,7 +28,7 @@ enum GraphQLServerError: Error, Debuggable {
     case queryFailed, noData
 }
 
-public struct GraphQLServer<RootValue: FieldKeyProvider, Context> {
+public struct GraphQLServer<RootValue: FieldKeyProvider, Context, R: Router> {
     let schema: Schema<RootValue, Context>
     let getRootValue: (_ req: Request) -> RootValue
     let getContext: (_ req: Request) -> Context
@@ -52,15 +43,11 @@ public struct GraphQLServer<RootValue: FieldKeyProvider, Context> {
         self.getRootValue = getRootValue
     }
     
-    public func run(router: Router) throws -> Void {
-        router.post("graphql") { req -> Future<String> in
-            guard let httpBodyData = req.http.body.data else {
-                return req.eventLoop.newFailedFuture(error: GraphQLServerError.noData)
-            }
+    public func run(_ r: Routes) throws -> Void {
+        r.post("graphql") { req -> EventLoopFuture<String> in
+            let httpBody = try req.content.decode(GraphQLHTTPBody.self)
             
-            let httpBody = try JSONDecoder().decode(GraphQLHTTPBody.self, from: httpBodyData)
-            
-            let promise: Promise<String> = req.eventLoop.newPromise()
+            let promise = req.eventLoop.makePromise(of: String.self)
             
             let graphQLFuture = self.schema.execute(
                 request: httpBody.query,
@@ -72,11 +59,11 @@ public struct GraphQLServer<RootValue: FieldKeyProvider, Context> {
             )
             
             graphQLFuture.whenFailure({ error in
-                promise.fail(error: error)
+                promise.fail(error)
             })
             
             graphQLFuture.whenSuccess({ map in
-                promise.succeed(result: map.description)
+                promise.succeed(map.description)
             })
             
             return promise.futureResult
