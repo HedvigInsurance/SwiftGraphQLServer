@@ -12,7 +12,7 @@ let package = Package(
             targets: ["SwiftGraphQLServer"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/HedvigInsurance/Graphiti.git", .exact("0.14.0")),
+        .package(url: "https://github.com/HedvigInsurance/Graphiti.git", .exact("0.15.0")),
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0-alpha")
     ],
     targets: [

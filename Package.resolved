@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/HedvigInsurance/Graphiti.git",
         "state": {
           "branch": null,
-          "revision": "ccd8d894427008c63b375483f6a29694ed2e1978",
-          "version": "0.14.0"
+          "revision": "cf7a567cf18cddd1c038059f08cbb6b885d1a97c",
+          "version": "0.15.0"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/HedvigInsurance/GraphQL.git",
         "state": {
           "branch": null,
-          "revision": "0fa55e1da2169c079f93d4a2d1d3291531fa5384",
-          "version": "0.15.0"
+          "revision": "bdcb4f8d9733e8d54910d8060024b127ebc76dc4",
+          "version": "0.16.0"
         }
       },
       {
